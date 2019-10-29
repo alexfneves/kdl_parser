@@ -42,8 +42,10 @@
 
 #include "kdl/tree.hpp"
 #include "urdf_model/model.h"
+#include "sdf/sdf.hh"
 
 #include "kdl_parser/visibility_control.hpp"
+#include "kdl_parser/model_format.hpp"
 
 namespace kdl_parser
 {
@@ -51,10 +53,15 @@ namespace kdl_parser
 /** Constructs a KDL tree from a file, given the file name
  * \param file The filename from where to read the xml
  * \param tree The resulting KDL Tree
+ * \param the file format
  * returns true on success, false on failure
  */
 KDL_PARSER_PUBLIC
-bool treeFromFile(const std::string & file, KDL::Tree & tree);
+bool treeFromFile(const std::string & file, KDL::Tree & tree, MODEL_FORMAT format = MODEL_URDF);
+
+KDL_PARSER_PUBLIC
+bool treeFromFile(const std::string & file, KDL::Tree & tree)
+{treeFromFile(file, tree, MODEL_SDF);}
 
 /** Constructs a KDL tree from the parameter server, given the parameter name
  * \param param the name of the parameter on the parameter server
@@ -70,11 +77,16 @@ bool treeFromParam(const std::string & param, KDL::Tree & tree);
  * returns true on success, false on failure
  */
 KDL_PARSER_PUBLIC
-bool treeFromString(const std::string & xml, KDL::Tree & tree);
+bool treeFromString(const std::string & xml, KDL::Tree & tree, MODEL_FORMAT format = MODEL_URDF);
 
-/** Constructs a KDL tree from a TiXmlDocument
+KDL_PARSER_PUBLIC
+bool treeFromString(const std::string & xml, KDL::Tree & tree)
+{treeFromString(xml, tree, MODEL_SDF);}
+
+/** Constructs a KDL tree from a TiXmlDocument of a URDF
  * \param xml_doc The TiXmlDocument containting the xml description of the robot
  * \param tree The resulting KDL Tree
+ * \param the file format
  * returns true on success, false on failure
  */
 KDL_PARSER_PUBLIC
@@ -83,10 +95,18 @@ bool treeFromXml(TiXmlDocument * xml_doc, KDL::Tree & tree);
 /** Constructs a KDL tree from a URDF robot model
  * \param robot_model The URDF robot model
  * \param tree The resulting KDL Tree
+ * \param the file format
  * returns true on success, false on failure
  */
 KDL_PARSER_PUBLIC
 bool treeFromUrdfModel(const urdf::ModelInterface & robot_model, KDL::Tree & tree);
+
+/** Constructs a KDL tree from a SDF robot model
+ * \param robot_model The SDF robot model
+ * \param tree The resulting KDL Tree
+ */
+KDL_PARSER_PUBLIC
+bool treeFromSdfModel(const sdf::ElementPtr& sdf_model, KDL::Tree& tree);
 }  // namespace kdl_parser
 
 #endif  // KDL_PARSER__KDL_PARSER_HPP_

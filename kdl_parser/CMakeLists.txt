@@ -8,6 +8,7 @@ find_package(tinyxml_vendor REQUIRED)
 find_package(TinyXML REQUIRED)
 find_package(urdf REQUIRED)
 find_package(urdfdom_headers REQUIRED)
+find_package(SDFormat REQUIRED)
 find_library(KDL_LIBRARY REQUIRED
   NAMES orocos-kdl
   HINTS ${orocos_kdl_LIBRARY_DIRS})
@@ -17,11 +18,13 @@ include_directories(
   ${orocos_kdl_INCLUDE_DIRS}
   ${urdf_INCLUDE_DIRS}
   ${urdfdom_headers_INCLUDE_DIRS}
+  ${SDFormat_INCLUDE_DIRS}
   ${TinyXML_INCLUDE_DIRS})
 
 link_directories(
   ${orocos_kdl_LIBRARY_DIRS}
-  ${urdf_LIBRARY_DIRS})
+  ${urdf_LIBRARY_DIRS}
+  ${SDFormat_LIBRARY_DIRS})
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
@@ -30,12 +33,16 @@ endif()
 
 add_library(
   ${PROJECT_NAME}
-  src/kdl_parser.cpp)
+  src/kdl_parser.cpp
+  src/model_format.cpp
+  src/urdf.cpp
+  src/sdf.cpp)
 target_link_libraries(
   ${PROJECT_NAME}
   ${TinyXML_LIBRARIES}
   ${orocos_kdl_LIBRARIES}
-  ${urdf_LIBRARIES})
+  ${urdf_LIBRARIES}
+  ${SDFormat_LIBRARIES})
 
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE "KDL_PARSER_BUILDING_DLL")
