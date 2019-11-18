@@ -63,7 +63,11 @@ void Links::toKdlTree(KDL::Tree & tree, std::string parent, bool root)
         KDL::RigidBodyInertia I;
         if (l.sdf_->HasElement("inertial"))
             I = sdfInertiaToKdl(l.sdf_->GetElement("inertial"));
-        KDL::Segment segment(l.name(), joint, l.frame_, I);
+        auto new_segment_frame = l.frame_;
+        auto parent_obj = this->find(parent);
+        if (parent_obj)
+            new_segment_frame = this->find(parent)->frame_.Inverse()*new_segment_frame;
+        KDL::Segment segment(l.name(), joint, new_segment_frame, I);
         tree.addSegment(segment, kdl_parent);
         toKdlTree(tree, l.name(), false);
     }
@@ -217,7 +221,8 @@ Links loadLinks(const sdf::ElementPtr& sdf_model, std::string model_name, KDL::F
                 if (child_link_ptr->sdf_->HasElement("pose")) {
                     child_2_model = toKdl(child_link_ptr->sdf_->GetElement("pose")->Get<Pose3d>());
                 }
-                KDL::Frame child_2_parent = root_2_model.Inverse() * child_2_model;
+                auto parent_2_model = getLinkPose(parent_link_ptr->sdf_);
+                KDL::Frame child_2_parent = parent_2_model.Inverse() * child_2_model;
                 KDL::Frame joint_2_parent = child_2_parent * joint_2_child;
 
                 if (use_parent_model_frame){
